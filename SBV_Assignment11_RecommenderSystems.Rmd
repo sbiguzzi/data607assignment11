@@ -1,0 +1,57 @@
+---
+title: "Week 11 Assignment - Recommender Systems"
+author: "Stefano Biguzzi"
+date: "11/03/2020"
+output:
+  prettydoc::html_pretty:
+    highlight: github
+    theme: leonids
+    # theme: tactile
+---
+
+## *Introduction and Assignment Prompt*
+*Your task is to analyze an existing recommender system that you find interesting. You should:*
+
+1. *Perform a Scenario Design analysis as described below.  Consider whether it makes sense for your selected recommender system to perform scenario design twice, once for the organization (e.g. Amazon.com) and once for the organization's customers.*
+2. *Attempt to reverse engineer what you can about the site, from the site interface and any available information that you can find on the Internet or elsewhere.*
+3. *Include specific recommendations about how to improve the site's recommendation capabilities going forward.*
+4. *Create your report using an R Markdown file, and create a discussion thread with a link to the GitHub repo where your Markdown file notebook resides.  You are not expected to need to write code for this discussion assignment.*
+
+## Part I - Scenario Design Analysis
+
+In a scenario design analysis we want to address three questions to determine, 1) Who are we trying to target with out product, 2) What is the goal of the target audience when using the product, and 3) How can we help the target audience achieve their goals. In this assignment I decided to use the NYTimes recommender system as my example. Below is a scenario design analysis for that recommender system.
+
+1. **Who are the target audience:** People who are subscribed and read New York Times articles.
+2. **What is the key goals:** To increase clicks on the website or app from subscribers on articles.
+3. **How can you help them to accomplish these goals:** Create a recommender system and reader profile to populate the home page with relevant and recommended articles to the subscribers that they might be more interested in clicking and reading.
+
+## Part II - Attempt to Reverse Engineer the Recommender System
+
+The New York Times a combination of hybrid filtering and a natural language processing technique to recommend articles to subscribers.
+
+### <span style="color:#878F97;">Hybrid filtering^[[A quick look at recommendation engines and how the New York Times makes recommendations](https://knightlab.northwestern.edu/2016/03/28/a-quick-look-at-recommendation-engines-and-how-the-new-york-times-makes-recommendations/)]<span>
+
+Before I get into the NY Times recommender system it's important to understand hybrid filtering. Hybrid filtering uses a combination of content based recommendations and collaborative filtering. Applying only this method means a subscribers recommendations are based on article *tags* and the popularity among other like-minded subscribers.
+
+### <span style="color:#878F97;">NY Times Recommender System^[[Building the Next New York Times Recommendation Engine](https://open.blogs.nytimes.com/2015/08/11/building-the-next-new-york-times-recommendation-engine/)]<span>
+
+The New York Times uses a natural language processing technique known as [Latent Dirichlet Allocation](https://en.wikipedia.org/wiki/Latent_Dirichlet_allocation)]. The LDA model learns the words associated with different topics and creates a assigns a weight to each word for topic. Think "gene" for the topic of genetics. Based on this approach the NY Times to categorize articles. 
+
+Using this approach has some limits though as LDA cannot alone decipher the context of the writing. LDA cannot interpret if the words in an article are some kind of metaphor or allegory and could incorrectly assign a topic of animal to an article that contains words like "dog", "cat", or "turtle". To adjust for this limitation the NY Times uses reader history to understand the other article subscribers have clicked on. Combining these two approaches they are able to lower the weight of the article in the animal topic to something that is closer to the real topic of the article. Based on who is clicking the article the LDA algorithm can take into account the error assigning the topic "animal" and correctly assign it a higher weight to another topic that is more closely related to the type of readers that are clicking the article. The algorithm keeps doing this until there is little error in the topic weights and the type of readers who click the article.
+
+The final step to the NY Times approach is to assign readers to a particular topic. Let's say a user clicks an article that is 70% politics and 30% health and then another article that is 40% politics and 60% health, the NY Times averages those scores and assigns you a score of 0.55 politics and 0.45 health. Since these numbers are based on clicks the NY Times adds a weight to each article click. They call this the "back-off approach", where they assume a user "90% likes" an article they read and "10% like" the articles they click but don't read. I could not find an article on how they track if you read an article or not, but I assume they can track how long a user stays on an article and calculate based on that.
+
+Using a hybrid system with these three parts: modeling articles by text accounting for user reading patterns and describing readers based on their history, the NY Times creates their recommender system.
+
+
+## Part III - Recommendations for the NY Times
+
+The NY Times has a pretty sturdy recommender system already, but I think there is additional contextual information they can add to the algorithm to make it even more robust. One approach they could use is this simple linear regression [contextual-bandit model]( http://rob.schapire.net/papers/www10.pdf), which would allow the NY Times to relate contextual information to whatever engagement measure they already us with articles.^[As of 2015 their system does not include this type of model, I assume they've updated their system and incorporated something like this.] By using this approach the NY Times could add context like state or country of subscribers to better understand if that plays a role in how users engage with the website or app. By doing this they might be able to better recommend articles by using both the above recommender system with a contextual model and create an even more engaging website or app for their subscribers.
+
+Another recommendation that could be useful is adding a way to asses interest in topics for new subscribers. Their recommender system seems to be working off of clicks and reading, but when someone subscribes for the first time they are virgin users, i.e. they have to clicks or read articles. Some of the television networks implement something like this on their apps. The one that comes to mind is CBS All Access, which asks new users to select at least 3 shows that they are interested in. By adopting a similar model the NY Times can recommend articles that might be more engaging as soon as the new users sign up as subscribers.
+
+
+
+
+
+
